@@ -44,6 +44,14 @@ mvn -q test-compile
 java -cp "target/classes;target/test-classes" TestRunner
 ```
 
+Current test coverage includes:
+- Position
+- Direction
+- Table
+- Robot
+- Invalid PLACE (missing arguments)
+- Invalid Position (`PLACE 5,5,NORTH`)
+
 The test runner prints per-test pass/fail lines and a final summary.
 
 ## Commands
@@ -56,8 +64,14 @@ The test runner prints per-test pass/fail lines and a final summary.
 
 ## Rules
 - The robot must be placed on the table before movement commands take effect.
-- Invalid commands are ignored.
+- `PLACE` positions outside the table bounds (e.g., beyond `4,4`) are rejected.
+- Malformed commands produce an error message to stderr.
 - Any move that would cause the robot to fall is ignored.
+
+## Error Messages
+- `Invalid PLACE command (missing arguments)`
+- `Invalid PLACE command (position out of bounds)`
+- `Invalid command: <input>` for malformed commands (for example invalid direction values)
 
 ## Example Output
 - Example A: `0,1,NORTH`

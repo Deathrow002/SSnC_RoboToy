@@ -4,11 +4,11 @@ import org.robotoy.Position;
 import org.robotoy.Robot;
 import org.robotoy.Table;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 
 public class TestRunner {
     public static void main(String[] args) {
@@ -21,6 +21,7 @@ public class TestRunner {
         if (runTest("Table", TestRunner::testTable)) passed++; else failed++;
         if (runTest("Robot", TestRunner::testRobot)) passed++; else failed++;
         if (runTest("Invalid PLACE", TestRunner::testInvalidPlaceCommand)) passed++; else failed++;
+        if (runTest("Invalid Position", TestRunner::testInvalidPositionCommand)) passed++; else failed++;
 
         System.out.println("--------------------------------------------------");
         System.out.println("Tests completed. Passed: " + passed + ", Failed: " + failed);
@@ -127,24 +128,29 @@ public class TestRunner {
     }
 
     private static void testInvalidPlaceCommand() {
+        String stderr = runAppAndCaptureStderr("PLACE\nREPORT\n");
+        assertContains(stderr, "Invalid PLACE command (missing arguments)",
+                "App should report missing PLACE arguments");
+    }
+
+    private static void testInvalidPositionCommand() {
+        String stderr = runAppAndCaptureStderr("PLACE 5,5,NORTH\nREPORT\n");
+        assertContains(stderr, "Invalid PLACE command (position out of bounds)",
+                "App should report PLACE position out of bounds");
+    }
+
+    private static String runAppAndCaptureStderr(String input) {
+        InputStream originalIn = System.in;
         PrintStream originalErr = System.err;
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
         try {
-            Path tempInput = Files.createTempFile("robotoy-invalid-place", ".txt");
-            Files.writeString(tempInput, "PLACE\nREPORT\n");
-
+            System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
             System.setErr(new PrintStream(errContent));
-            App.main(new String[]{tempInput.toString()});
-
-            String stderr = errContent.toString();
-            assertContains(stderr, "Invalid PLACE command (missing arguments)",
-                    "App should report missing PLACE arguments");
-
-            Files.deleteIfExists(tempInput);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to run invalid PLACE test", e);
+            App.main(new String[0]);
+            return errContent.toString();
         } finally {
+            System.setIn(originalIn);
             System.setErr(originalErr);
         }
     }

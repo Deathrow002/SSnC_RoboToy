@@ -77,7 +77,7 @@ public class App {
                     break;
             }
         } catch (IllegalArgumentException e) {
-            // Ignore malformed commands
+            System.err.println("Invalid command: " + commandLine);
         }
     }
 
