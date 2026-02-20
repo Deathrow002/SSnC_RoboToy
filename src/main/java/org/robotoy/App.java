@@ -9,6 +9,8 @@ public class App {
         Table table = new Table(5, 5);
         Robot robot = new Robot(table);
 
+        printGuide();
+
         try (BufferedReader reader = createReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -21,6 +23,15 @@ public class App {
 
     private static BufferedReader createReader() {
         return new BufferedReader(new InputStreamReader(System.in));
+    }
+
+    private static void printGuide() {
+        System.out.println("Please Insert Command");
+        System.out.println("Commands: PLACE X,Y,F | MOVE | LEFT | RIGHT | REPORT | EXIT");
+    }
+
+    private static void printPlaceGuide() {
+        System.out.println("PLACE format: PLACE X,Y,F (example: PLACE 0,0,NORTH)");
     }
 
     private static void processCommand(String commandLine, Robot robot, Table table) {
@@ -43,11 +54,16 @@ public class App {
                                 robot.place(position, direction);
                             } else {
                                 System.err.println("Invalid PLACE command (position out of bounds)");
+                                printGuide();
                             }
+                        } else {
+                            System.err.println("Invalid PLACE command (invalid format)");
+                            printGuide();
                         }
                     }
                     else {
                         System.err.println("Invalid PLACE command (missing arguments)");
+                        printGuide();
                     }
                     break;
                 case "MOVE":
@@ -73,11 +89,17 @@ public class App {
                     System.exit(0);
                     break;
                 default:
-                    // Ignore invalid commands
+                    System.err.println("Invalid command: " + commandLine);
+                    printGuide();
                     break;
             }
         } catch (IllegalArgumentException e) {
             System.err.println("Invalid command: " + commandLine);
+            if ("PLACE".equals(command)) {
+                printPlaceGuide();
+            } else {
+                printGuide();
+            }
         }
     }
 
