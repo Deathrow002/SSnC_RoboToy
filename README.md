@@ -1,60 +1,82 @@
 # Toy Robot Simulator
 
-## Description
-This application simulates a toy robot moving on a square tabletop, of dimensions 5 units x 5 units. The robot can be placed on the table, moved, and rotated. It will ignoring any movement that would cause it to fall to destruction.
+## Overview
+This application simulates a toy robot moving on a 5x5 tabletop.
 
-## Getting Started
+- The robot can be placed, moved, and rotated.
+- Any command that would move the robot off the table is ignored.
+- Commands are read from standard input.
 
-### Build
-To compile the source code, open a terminal in the project root and run:
-`javac -d bin src/*.java`
-(Or list all files if using a shell like PowerShell without glob expansion: `Get-ChildItem src/*.java | ForEach-Object { javac -d bin $_.FullName }`)
+## Project Layout
 
-### Run
-To run the application with interactive input:
-`java -cp bin App`
+```text
+src/
+   main/java/org/robotoy/
+      App.java
+      Direction.java
+      Position.java
+      Robot.java
+      Table.java
+   test/java/
+      TestRunner.java
+```
 
-To run with a file input (e.g., the provided test data):
-`java -cp bin App test_input.txt`
+## Build
+From the project root:
+
+```bash
+mvn compile
+```
+
+## Run
+Run the simulator in interactive mode:
+
+```bash
+mvn -q exec:java -Dexec.mainClass="org.robotoy.App"
+```
+
+If `exec-maven-plugin` is not configured, use:
+
+```bash
+mvn -q compile
+java -cp target/classes org.robotoy.App
+```
 
 ## Testing
-A custom unit test runner is included to verify the application logic.
+This project includes a custom test runner (`TestRunner`).
 
-### Running Tests
-To compile and run the tests:
-1. Compile the test runner:
-   `javac -d bin src/*.java`
-   (Or: `javac -d bin src/TestRunner.java src/App.java src/Direction.java src/Position.java src/Robot.java src/Table.java`)
+```bash
+mvn -q test-compile
+java -cp "target/classes;target/test-classes" TestRunner
+```
 
-2. Run the test runner:
-   `java -cp bin TestRunner`
+Expected summary:
 
-Expected output:
-`	ext
+```text
 Running tests...
 [PASS] Position
 [PASS] Direction
 [PASS] Table
 [PASS] Robot
+[PASS] Invalid PLACE
 --------------------------------------------------
-Tests completed. Passed: 4, Failed: 0
-` 
+Tests completed. Passed: 5, Failed: 0
+```
 
-## Logic & Design
-- `App.java`: Main entry point, handles input parsing.
-- `Robot.java`: Handles the robot's movement and state logic.
-- `Table.java`: Validates positions on the 5x5 grid.
-- `Position.java`: Represents coordinates (X, Y).
-- `Direction.java`: Enum for orientation (NORTH, EAST, SOUTH, WEST).
+## Commands
+- `PLACE X,Y,F` where `F` is one of `NORTH`, `EAST`, `SOUTH`, `WEST`
+- `MOVE`
+- `LEFT`
+- `RIGHT`
+- `REPORT`
+- `EXIT`
 
-## Test Data
-A sample input file `test_input.txt` is provided in the project root.
-Output matches the challenge requirements:
-- Example a: `0,1,NORTH`
-- Example b: `0,0,WEST`
-- Example c: `3,3,NORTH`
+## Rules
+- The robot must be placed on the table before movement commands take effect.
+- Invalid commands are ignored.
+- Any move that would cause the robot to fall is ignored.
 
-Input can be from a file, or from standard input, as the developer chooses. Provide test data to exercise the application.
-Constraints: The toy robot must not fall off the table during movement.
-This also includes the initial placement of the toy robot.
-Any move that would cause the robot to fall must be ignored.
+## Example Output
+- Example A: `0,1,NORTH`
+- Example B: `0,0,WEST`
+- Example C: `3,3,NORTH`
