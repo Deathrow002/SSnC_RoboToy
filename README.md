@@ -32,12 +32,6 @@ mvn compile
 Run the simulator in interactive mode:
 
 ```bash
-mvn -q exec:java -Dexec.mainClass="org.robotoy.App"
-```
-
-If `exec-maven-plugin` is not configured, use:
-
-```bash
 mvn -q compile
 java -cp target/classes org.robotoy.App
 ```
@@ -50,18 +44,7 @@ mvn -q test-compile
 java -cp "target/classes;target/test-classes" TestRunner
 ```
 
-Expected summary:
-
-```text
-Running tests...
-[PASS] Position
-[PASS] Direction
-[PASS] Table
-[PASS] Robot
-[PASS] Invalid PLACE
---------------------------------------------------
-Tests completed. Passed: 5, Failed: 0
-```
+The test runner prints per-test pass/fail lines and a final summary.
 
 ## Commands
 - `PLACE X,Y,F` where `F` is one of `NORTH`, `EAST`, `SOUTH`, `WEST`
