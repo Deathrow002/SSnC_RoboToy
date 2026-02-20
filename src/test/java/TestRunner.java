@@ -4,9 +4,11 @@ import org.robotoy.Position;
 import org.robotoy.Robot;
 import org.robotoy.Table;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class TestRunner {
     public static void main(String[] args) {
@@ -125,21 +127,24 @@ public class TestRunner {
     }
 
     private static void testInvalidPlaceCommand() {
-        java.io.InputStream originalIn = System.in;
         PrintStream originalErr = System.err;
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
         try {
-            ByteArrayInputStream input = new ByteArrayInputStream("PLACE\nREPORT\n".getBytes());
-            System.setIn(input);
+            Path tempInput = Files.createTempFile("robotoy-invalid-place", ".txt");
+            Files.writeString(tempInput, "PLACE\nREPORT\n");
+
             System.setErr(new PrintStream(errContent));
-            App.main(new String[0]);
+            App.main(new String[]{tempInput.toString()});
 
             String stderr = errContent.toString();
             assertContains(stderr, "Invalid PLACE command (missing arguments)",
                     "App should report missing PLACE arguments");
+
+            Files.deleteIfExists(tempInput);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to run invalid PLACE test", e);
         } finally {
-            System.setIn(originalIn);
             System.setErr(originalErr);
         }
     }
