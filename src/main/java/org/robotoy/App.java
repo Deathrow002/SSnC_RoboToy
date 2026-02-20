@@ -38,7 +38,12 @@ public class App {
                             int x = Integer.parseInt(params[0].trim());
                             int y = Integer.parseInt(params[1].trim());
                             Direction direction = Direction.valueOf(params[2].trim().toUpperCase());
-                            robot.place(new Position(x, y), direction);
+                            Position position = new Position(x, y);
+                            if (table.isValidPosition(position)) {
+                                robot.place(position, direction);
+                            } else {
+                                System.err.println("Invalid PLACE command (position out of bounds)");
+                            }
                         }
                     }
                     else {
